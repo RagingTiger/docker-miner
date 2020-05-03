@@ -1,7 +1,29 @@
 # cpp builder image
 FROM ubuntu:18.04 AS cppbuilder
 
-# RUN git https://github.com/RagingTiger/xmrig.git
+# build dependencies
+RUN apt-get update && apt-get install -y \
+    autoconf \
+    automake \
+    build-essential \
+    cmake \
+    git \
+    libhwloc-dev \
+    libssl-dev \
+    libtool \
+    libuv1-dev \
+    wget 
+
+# set workdir
+WORKDIR /root
+RUN git clone https://github.com/RagingTiger/xmrig.git && \
+    cd xmrig/scripts && \
+    ./build_deps.sh && \
+    cd /root/xmrig && \
+    mkdir build && \
+    cd build && \
+    cmake .. -DXMRIG_DEPS=scripts/deps -DCMAKE_BUILD_TYPE=Release && \
+    make -j$(nproc)    
 
 # go builder image
 FROM golang:alpine3.10 AS gobuilder
