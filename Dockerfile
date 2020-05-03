@@ -25,6 +25,11 @@ RUN git clone https://github.com/RagingTiger/xmrig.git && \
     cmake .. -DXMRIG_DEPS=scripts/deps -DCMAKE_BUILD_TYPE=Release && \
     make -j$(nproc)    
 
+# xmrig production
+FROM ubuntu:18.04 AS xmrig
+
+COPY --from=cppbuilder /root/xmrig/build/xmrig /usr/bin/
+
 # go builder image
 FROM golang:alpine3.10 AS gobuilder
 
@@ -52,7 +57,7 @@ RUN apk add --no-cache \
 RUN pip3 install -vvv --user py-cryptonight requests
 
 # production
-FROM alpine:3.10.5
+FROM alpine:3.10.5 AS production
 
 # get python
 RUN apk add --no-cache \
