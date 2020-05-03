@@ -1,7 +1,19 @@
-# go builder image
-#FROM golang:alpine3.10 AS gobuilder
+# cpp builder image
+FROM ubuntu:18.04 AS cppbuilder
 
-# production image
+# RUN git https://github.com/RagingTiger/xmrig.git
+
+# go builder image
+FROM golang:alpine3.10 AS gobuilder
+
+# get dependencies
+RUN apk add --no-cache \
+    git
+
+# go get RUN apk --no-cache add
+RUN go get -v -u ekyu.moe/cryptonight/cmd/cnhash
+
+# pybuilder image
 FROM alpine:3.10.5 AS pybuilder
 
 # pull dependencies
@@ -26,3 +38,4 @@ RUN apk add --no-cache \
 
 # get pybuilder 
 COPY --from=pybuilder /root/.local /root/.local
+COPY --from=gobuilder /go/bin/ /usr/bin/
